@@ -1,0 +1,12 @@
+.env
+.vscode
+data/*
+!data/.gitkeep
+log/*
+!log/.gitkeep
+output/*
+!output/.gitkeep
+__pycache__
+*.lnk
+config/*
+!config/config.example.yaml
