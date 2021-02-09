@@ -1,6 +1,12 @@
-from kobo_exporter.model.model import read_bookmarks
+import docx
+from kobo_exporter.model.model import read_bookmarks, format_bookamrk
 
+
+doc = docx.Document()
 
 bookmarks = read_bookmarks()
 for bookmark in bookmarks:
-    print(bookmark.format_bookamrk())
+    doc.add_paragraph(format_bookamrk(bookmark))
+    doc.add_paragraph('')
+
+doc.save('note.docx')
