@@ -24,36 +24,47 @@ class Content(Base):
     book_title = Column('BookTitle', Text)
 
 
-def read_bookmarks(book_title=None) -> Bookmark:
-    '''read bookmarks'''
-    bookmarks = session.query(Bookmark, Content.book_title).\
-        join(Content, Bookmark.book_id == Content.book_id).\
-        filter(Content.book_title.like('%' + book_condition + '%')).\
-        all()
-    return bookmarks
+class Handler():
+    def read_bookmarks(self, book_title=None) -> Bookmark:
+        '''read bookmarks'''
+        bookmarks = session.query(Bookmark, Content.book_title).\
+            join(Content, Bookmark.book_id == Content.book_id).\
+            filter(Content.book_title.like('%' + book_condition + '%')).\
+            all()
+        return bookmarks
 
+    def format_bookamrk(self, bookmark) -> str:
+        '''format bookmark to note'''
+        if bookmark.Bookmark.annotation is None:
+            bookmark.Bookmark.annotation = ""
+        bookmark.Bookmark.text = bookmark.Bookmark.text.replace('\n', '')
+        bookmark.Bookmark.text = bookmark.Bookmark.text.replace('\r', '')
+        bookmark.Bookmark.text = bookmark.Bookmark.text.replace(' ', '')
+        if bookmark.Bookmark.annotation != '':
+            note = '「{:s}」《{:s}》\n'.\
+                format(
+                    bookmark.Bookmark.text,
+                    bookmark.book_title
+                )
+        else:
+            note = '「{:s}」《{:s}》'.\
+                format(
+                    bookmark.Bookmark.text,
+                    bookmark.book_title
+                )
+        return note
 
-def format_bookamrk(bookmark) -> str:
-    '''format bookmark to note'''
-    if bookmark.Bookmark.annotation is None:
-        bookmark.Bookmark.annotation = ""
-    bookmark.Bookmark.text = bookmark.Bookmark.text.replace('\n', '')
-    bookmark.Bookmark.text = bookmark.Bookmark.text.replace('\r', '')
-    bookmark.Bookmark.text = bookmark.Bookmark.text.replace(' ', '')
-    if bookmark.Bookmark.annotation != '':
-        note = '「{:s}」《{:s}》\n{:s}'.\
-            format(
-                bookmark.Bookmark.text,
-                bookmark.book_title,
-                bookmark.Bookmark.annotation
-            )
-    else:
-        note = '「{:s}」《{:s}》'.\
-            format(
-                bookmark.Bookmark.text,
-                bookmark.book_title
-            )
-    return note
+    def format_annotation(self, bookmark) -> str:
+        '''format annotation to note'''
+        if bookmark.Bookmark.annotation is None:
+            return ''
+        if bookmark.Bookmark.annotation != '':
+            note = '{:s}'.\
+                format(
+                    bookmark.Bookmark.annotation
+                )
+            return note
+        return ''
 
 
 with open("config/config.yaml", "r", encoding='utf-8') as stream:
